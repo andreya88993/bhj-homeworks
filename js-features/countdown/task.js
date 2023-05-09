@@ -5,7 +5,7 @@ const reverseTimer = setInterval(() => {
   if(value > 0) {
     timer.textContent = value - 1;
   } else {
-    // clearInterval(alert("Вы победили в конкурсе!"))
+    clearInterval(reverseTimer);
     alert("Вы победили в конкурсе!")
   }
 },300);
