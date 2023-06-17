@@ -1,39 +1,55 @@
-const control = document.querySelectorAll('.control');
-const form = document.getElementById('signin__form');
-const welcomeUser = document.querySelector('.welcome');
-const xhr = new XMLHttpRequest();
-const activeFlag = true;
 
-function sendData(payload) {
-  xhr.open("POST", 'https://students.netoservices.ru/nestjs-backend/auth')
-  xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-  xhr.responseType = 'json'
-  xhr.send(JSON.stringify(payload));
 
-  xhr.onload = function () {
-    welcomeUser.classList.add('welcome_active')
-    let resposeObj = xhr.response;
-    if (resposeObj.success) {
-      document.getElementById('user_id').outerText = resposeObj.user_id;
-      document.getElementById('signin').className = 'signin'
-      localStorage.setItem('user', String(resposeObj.user_id))
-    } else {
-      document.getElementById('signin').classList.add('signin_active')
-    }
-  }
+const signin = document.getElementById('signin');
+const signinForm = document.getElementById('signin__form');
+const welcome = document.getElementById("welcome")
+const userId = document.getElementById("user_id")
+const signoutBtn = document.getElementById("signout__btn");
+
+// localStorage.clear();
+
+
+if (localStorage.userId) {
+    signin.classList.remove("signin_active")
+    welcome.classList.add("welcome_active");
+    userId.innerHTML = localStorage.userId;
+} else {
+    auth();
 }
 
-function check() {
-
+signoutBtn.onclick = () => {
+    signin.classList.add("signin_active")
+    welcome.classList.remove("welcome_active");
+    localStorage.clear();
 }
 
-function formSend(event) {
-  event.preventDefault()
-  let info;
-  control.forEach((el) => {
-    info = { ...info, [el.name]: el.value }
-  })
-  sendData(info)
+function auth() {
+    signinForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        let formData = new FormData(signinForm);
+        let request = new XMLHttpRequest();
+        request.open('POST', 'https://students.netoservices.ru/nestjs-backend/auth');
+        request.send(formData);
+        request.onreadystatechange = function () {
+            if (request.readyState === 4) {
+                let data = JSON.parse(this.responseText);
+                if (data.success) {
+                    welcome.classList.add("welcome_active");
+                    signin.classList.remove("signin_active")
+                    localStorage.userId = data.user_id;
+                    userId.innerHTML = localStorage.userId;
+                } else {
+                    alert('Неверный логин/пароль');
+                }
+            }
+        }
+        clearForm(signinForm.querySelectorAll("input"));
+
+    });
 }
 
-form.addEventListener('submit', formSend)
+function clearForm(fields) {
+    fields.forEach(field => {
+        field.value = '';
+    })
+}

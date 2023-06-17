@@ -1,12 +1,19 @@
-const editor = document.getElementById("editor");
+const clearButton = document.querySelector('.clear_button');
+const deleteButton = document.querySelector('.delete_button');
+const editor = document.getElementById('editor');
+let textLocalStorage = localStorage.getItem('editorText');
 
-editor.value = localStorage.getItem('textEditor');
-editor.addEventListener("keyup", (event) => {
-    localStorage.textEditor = editor.value;
+editor.value = textLocalStorage;
+editor.addEventListener('input', function () {
+  localStorage.setItem('editorText', editor.value);
 });
 
-const clear = document.getElementById("clearTextEditor");
-clear.addEventListener("click", () => {
-    localStorage.removeItem("textEditor");
-    editor.value = "";
+clearButton.addEventListener('click', function () {
+  editor.value = '';
+  localStorage.removeItem('editorText');
+});
+
+deleteButton.addEventListener('click', function () {
+  editor.value = '';
+  localStorage.clear();
 });
